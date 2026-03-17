@@ -1,0 +1,195 @@
+# CRO Experiment Library
+
+A comprehensive library of A/B test ideas organized by page type and page element. Load this file when the user asks for experiment ideas or when you need to recommend more than 3 test hypotheses.
+
+## Table of Contents
+
+1. Hero Section Experiments
+2. CTA Experiments
+3. Social Proof Experiments
+4. Pricing Page Experiments
+5. Form Experiments
+6. Navigation Experiments
+7. Content and Copy Experiments
+8. Mobile-Specific Experiments
+
+---
+
+## 1. Hero Section Experiments
+
+**Headline tests:**
+- Outcome-focused vs. feature-focused headline
+- Short headline (under 8 words) vs. long headline (with subheadline)
+- Question headline vs. statement headline
+- Headline with a specific number/stat vs. without
+- Customer-centric ("You") vs. product-centric ("We/Our")
+
+**Visual tests:**
+- Product screenshot/demo vs. lifestyle image vs. illustration
+- Video hero vs. static image
+- Background image vs. solid color background
+- Hero with a person's face vs. abstract visual
+- Animated/interactive hero vs. static
+
+**Layout tests:**
+- Left-aligned text with right image vs. centered text
+- Hero with form embedded vs. hero with CTA button only
+- Full-viewport hero vs. shorter hero showing content below
+- Single CTA hero vs. hero with primary and secondary CTA
+
+---
+
+## 2. CTA Experiments
+
+**Button copy tests:**
+- Action verb ("Start") vs. benefit verb ("Get")
+- With urgency ("Start Free Trial Today") vs. without ("Start Free Trial")
+- First person ("Start My Trial") vs. second person ("Start Your Trial")
+- Specific ("Get 14-Day Free Trial") vs. general ("Try It Free")
+- With risk reducer ("Start Free, No Credit Card") vs. without
+
+**Button design tests:**
+- High-contrast color vs. muted color
+- Large button vs. standard button
+- Button with icon/arrow vs. text only
+- Rounded vs. sharp corners
+- With supporting microcopy below the button vs. without
+
+**Placement tests:**
+- Sticky/floating CTA bar vs. standard placement
+- CTA frequency: every section vs. every other section
+- CTA at end of testimonial section vs. end of feature section
+- Exit-intent CTA vs. no exit-intent
+
+---
+
+## 3. Social Proof Experiments
+
+**Type tests:**
+- Customer logos vs. testimonial quotes vs. review scores
+- Video testimonials vs. text testimonials
+- Case study snippets with metrics vs. general praise quotes
+- Real-time activity feed ("X people signed up today") vs. static count
+- Industry-specific testimonials vs. general
+
+**Format tests:**
+- Carousel testimonials vs. static grid
+- Named and attributed quotes vs. anonymous
+- Testimonials with photos vs. without
+- Long detailed testimonials vs. short one-liners
+- Star ratings display vs. written reviews
+
+**Placement tests:**
+- Social proof above the fold vs. below the fold
+- Trust badges near the CTA vs. in footer
+- Testimonials before pricing vs. after pricing
+- Logos bar at top of page vs. mid-page
+
+---
+
+## 4. Pricing Page Experiments
+
+**Structure tests:**
+- 2 tiers vs. 3 tiers vs. 4 tiers
+- Monthly default vs. annual default
+- Show savings percentage for annual vs. don't
+- Feature comparison table vs. feature lists per tier
+- "Most popular" badge on a tier vs. no badge
+
+**Price display tests:**
+- Per month vs. per year vs. per user/month
+- Rounded pricing ($50) vs. charm pricing ($49)
+- Show crossed-out original price vs. don't
+- Calculator/slider for usage-based pricing
+- "Starting at" pricing vs. exact pricing
+
+**CTA tests:**
+- "Start Free Trial" on all tiers vs. tier-specific CTAs
+- "Contact Sales" on enterprise vs. self-serve signup
+- Money-back guarantee messaging near price vs. away from price
+
+---
+
+## 5. Form Experiments
+
+**Length tests:**
+- Email only vs. email + name vs. full form
+- Single-page form vs. multi-step form
+- Progressive disclosure (ask more later) vs. all fields upfront
+
+**Design tests:**
+- Inline labels vs. floating labels vs. above-field labels
+- Single column vs. two column layout
+- With progress indicator vs. without
+- Form on page vs. form in modal
+
+**Microcopy tests:**
+- Privacy reassurance near email field vs. none
+- Helper text below fields vs. placeholder text
+- Error messages: inline vs. top of form
+- "No credit card required" messaging vs. none
+
+---
+
+## 6. Navigation Experiments
+
+**On landing pages:**
+- Full navigation vs. minimal navigation vs. no navigation
+- Sticky header vs. scroll-away header
+- CTA in navigation bar vs. no CTA in nav
+
+**On product pages:**
+- Mega menu vs. simple dropdown
+- Left sidebar navigation vs. top navigation
+- Breadcrumbs vs. no breadcrumbs
+- Search bar prominence: front and center vs. icon only
+
+---
+
+## 7. Content and Copy Experiments
+
+**Length tests:**
+- Long-form page vs. short-form page
+- Detailed feature descriptions vs. bullet summaries
+- With FAQ section vs. without
+
+**Tone tests:**
+- Professional/formal vs. conversational/casual
+- With humor vs. straightforward
+- Technical detail vs. simplified language
+
+**Content type tests:**
+- Feature list vs. use case stories
+- "How it works" section vs. no process section
+- Comparison table (vs. competitors) vs. standalone benefits
+- ROI calculator vs. static ROI claims
+
+---
+
+## 8. Mobile-Specific Experiments
+
+**Layout tests:**
+- Accordion content sections vs. full scroll
+- Sticky bottom CTA bar vs. inline CTAs only
+- Hamburger menu vs. bottom tab navigation
+- Thumb-zone optimized CTA placement
+
+**Content tests:**
+- Shortened mobile copy vs. same as desktop
+- Mobile-specific headline vs. same as desktop
+- Click-to-call CTA vs. form CTA
+- Swipeable testimonials vs. stacked
+
+---
+
+## Running Experiments
+
+When recommending experiments from this library:
+
+1. **Prioritize by impact**: test the elements closest to the conversion action first (CTAs, forms, hero) before testing secondary elements (footer, blog CTAs).
+2. **One variable at a time**: each test should isolate a single change unless running a multivariate test with sufficient traffic.
+3. **Set success criteria before launching**: define the primary metric, minimum detectable effect, and required sample size.
+4. **Run for full business cycles**: minimum 1-2 weeks to account for day-of-week and time-of-day patterns, even if statistical significance is reached earlier.
+5. **Document everything**: track hypothesis, variant descriptions, results, and learnings for compounding knowledge over time.
+
+For setting up experiments properly, use the **ab-test-setup** skill.
