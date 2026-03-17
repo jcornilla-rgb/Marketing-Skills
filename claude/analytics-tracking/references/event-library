@@ -1,0 +1,182 @@
+# Event Library
+
+Pre-built event definitions organized by site type and funnel stage. Copy and adapt these for your tracking plan. Each event includes the recommended name, properties, trigger description, and priority level.
+
+## Table of Contents
+
+1. [Marketing Site Events](#marketing-site)
+2. [SaaS / Product Events](#saas-product)
+3. [E-commerce Events](#ecommerce)
+4. [Content and Media Events](#content-media)
+5. [B2B and Lead Gen Events](#b2b-lead-gen)
+6. [Universal Events](#universal)
+
+---
+
+## Marketing Site Events {#marketing-site}
+
+### Navigation and Engagement
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| page_view | page_title, page_location, page_referrer, content_group | Every page load | P0 |
+| scroll_depth | percent_scrolled (25, 50, 75, 100), page_location | Scroll threshold reached | P1 |
+| cta_clicked | button_text, button_location, destination_url, page_type | CTA button click | P0 |
+| outbound_link_clicked | link_url, link_text, link_location | Click on external link | P2 |
+| video_played | video_id, video_title, video_duration | Video play initiated | P1 |
+| video_milestone | video_id, milestone (25, 50, 75, 100) | Video progress point | P2 |
+| resource_downloaded | resource_name, resource_type (pdf, ebook, whitepaper), page_location | Download link click | P1 |
+
+### Forms and Conversions
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| form_started | form_name, form_location, page_type | First field focused | P1 |
+| form_submitted | form_name, form_location, form_fields_count | Successful form submission | P0 |
+| form_error | form_name, error_type, error_field | Validation error shown | P2 |
+| signup_started | source, page_location | Signup flow initiated | P0 |
+| signup_completed | method (email, google, github), plan, source | Account created | P0 |
+| demo_requested | company_size, use_case, source | Demo form submitted | P0 |
+| contact_submitted | inquiry_type, source | Contact form submitted | P0 |
+| newsletter_subscribed | source, page_location | Email opt-in completed | P1 |
+
+---
+
+## SaaS / Product Events {#saas-product}
+
+### Onboarding
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| onboarding_started | method, source | User begins onboarding flow | P0 |
+| onboarding_step_completed | step_number, step_name, time_spent | Each onboarding step done | P0 |
+| onboarding_completed | total_time, steps_completed | All onboarding steps done | P0 |
+| onboarding_skipped | step_number, step_name | User skips onboarding | P1 |
+| first_key_action | action_type, time_from_signup | User completes activation action | P0 |
+
+### Core Usage
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| feature_used | feature_name, feature_category | Feature interaction | P0 |
+| action_completed | action_type, context | Core workflow completed | P1 |
+| search_performed | query, results_count, has_results | In-app search | P1 |
+| invite_sent | invitee_role, method | Team member invited | P1 |
+| integration_connected | integration_name, method | Third-party integration set up | P1 |
+| export_completed | export_format, record_count | Data exported | P2 |
+| error_encountered | error_type, error_code, page_location | Application error shown to user | P1 |
+
+### Monetization
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| trial_started | plan, source, duration_days | Trial begins | P0 |
+| trial_ending_soon | plan, days_remaining | Trial nearing end (3 days, 1 day) | P1 |
+| pricing_viewed | source, current_plan | Pricing page loaded | P0 |
+| plan_compared | plans_viewed | User compares plan features | P1 |
+| checkout_started | plan, billing_cycle, value | Checkout flow initiated | P0 |
+| purchase_completed | plan, billing_cycle, value, currency, method | Payment successful | P0 |
+| upgrade_completed | from_plan, to_plan, value_change | Plan upgraded | P0 |
+| downgrade_completed | from_plan, to_plan, value_change | Plan downgraded | P0 |
+| subscription_cancelled | plan, reason, tenure_days | Subscription cancelled | P0 |
+| payment_failed | plan, failure_reason | Payment processing error | P0 |
+
+---
+
+## E-commerce Events {#ecommerce}
+
+### Browsing
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| product_viewed | product_id, product_name, category, price, currency | Product page loaded | P0 |
+| product_list_viewed | list_name, products (array), list_position | Category or collection page | P0 |
+| product_searched | query, results_count, has_results | Site search for products | P1 |
+| product_filtered | filter_type, filter_value, results_count | Filter applied to product list | P2 |
+| product_sorted | sort_type (price_asc, popular, newest) | Sort applied to product list | P2 |
+| wishlist_added | product_id, product_name, price | Product saved to wishlist | P1 |
+
+### Cart
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| product_added_to_cart | product_id, product_name, quantity, price, currency, source | Add to cart action | P0 |
+| product_removed_from_cart | product_id, product_name, quantity, price | Remove from cart | P1 |
+| cart_viewed | cart_value, cart_items_count, products (array) | Cart page loaded | P0 |
+| coupon_applied | coupon_code, discount_value, discount_type | Coupon entered and validated | P1 |
+| coupon_failed | coupon_code, failure_reason | Invalid coupon attempted | P2 |
+
+### Checkout
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| checkout_started | cart_value, cart_items_count, currency | Checkout flow initiated | P0 |
+| checkout_step_completed | step_number, step_name (shipping, payment, review) | Each checkout step | P0 |
+| shipping_method_selected | method, cost | Shipping option chosen | P1 |
+| payment_info_entered | payment_type (card, paypal, apple_pay) | Payment details submitted | P0 |
+| purchase_completed | transaction_id, value, currency, tax, shipping, items, coupon | Order confirmed | P0 |
+| purchase_failed | error_type, cart_value | Payment or order failure | P0 |
+
+### Post-Purchase
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| order_confirmed | transaction_id, estimated_delivery | Confirmation page viewed | P1 |
+| review_submitted | product_id, rating, has_text | Product review posted | P2 |
+| refund_requested | transaction_id, reason, value | Refund initiated | P1 |
+
+---
+
+## Content and Media Events {#content-media}
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| article_viewed | article_id, title, author, category, word_count | Blog/article page loaded | P0 |
+| article_read | article_id, read_time, scroll_depth | User reads past 75% | P0 |
+| article_shared | article_id, share_method (copy, twitter, linkedin) | Share action completed | P1 |
+| comment_posted | article_id, comment_length | Comment submitted | P2 |
+| podcast_played | episode_id, episode_title, play_source | Podcast playback started | P1 |
+| podcast_completed | episode_id, listen_duration, completion_rate | Podcast playback ended | P1 |
+
+---
+
+## B2B and Lead Gen Events {#b2b-lead-gen}
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| lead_generated | source, lead_type (mql, sql), campaign | Lead qualification threshold met | P0 |
+| content_gated_downloaded | content_name, content_type, gate_type | Gated content accessed after form | P0 |
+| webinar_registered | webinar_id, webinar_title, source | Webinar registration completed | P0 |
+| webinar_attended | webinar_id, attendance_duration | User joined live webinar | P0 |
+| case_study_viewed | case_study_id, industry, company_size | Case study page viewed | P1 |
+| roi_calculator_completed | inputs_provided, result_value | Calculator tool completed | P1 |
+| sales_chat_started | source, page_location, agent_available | Live chat or chatbot initiated | P1 |
+| meeting_booked | meeting_type, source, calendar_tool | Calendar booking completed | P0 |
+
+---
+
+## Universal Events {#universal}
+
+Events that apply across all site types.
+
+| Event Name | Properties | Trigger | Priority |
+|---|---|---|---|
+| notification_shown | notification_type, message, location | In-app notification displayed | P2 |
+| notification_clicked | notification_type, destination | User clicks notification | P2 |
+| feedback_submitted | feedback_type (nps, csat, ces), score, has_comment | Feedback survey completed | P1 |
+| help_accessed | help_type (docs, chat, faq), query, page_location | User seeks help | P1 |
+| cookie_consent_given | consent_level, consent_categories | User completes consent action | P1 |
+| cookie_consent_denied | denied_categories | User rejects optional cookies | P1 |
+| dark_mode_toggled | mode (dark, light) | Theme preference changed | P3 |
+| language_changed | from_language, to_language | Locale switched | P2 |
+
+---
+
+## Priority Definitions
+
+| Priority | Meaning | Implementation Timeline |
+|---|---|---|
+| P0 | Critical for business decisions. Implement before launch. | Day 1 |
+| P1 | Important for optimization. Implement within first sprint. | Week 1-2 |
+| P2 | Nice to have for deeper analysis. Implement when capacity allows. | Month 1 |
+| P3 | Low priority. Implement only if specifically needed. | Backlog |
