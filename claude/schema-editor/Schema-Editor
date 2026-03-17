@@ -1,0 +1,96 @@
+---
+name: schema-auditor
+description: >
+  Audit, validate, and optimize JSON-LD structured data (schema markup) on any Dermadry web page.
+  Use this skill whenever the user gives a URL and wants to check, fix, add, or improve JSON schema
+  on a webpage. Triggers include: any mention of 'schema', 'structured data', 'JSON-LD', 'rich results',
+  'schema markup', or when the user pastes a Dermadry URL and asks to check or optimize it. Also use when
+  the user wants to add FAQPage, Product, Article, HowTo, MedicalDevice, or any other schema type to a page.
+  This skill handles fetching the page, extracting all existing schema blocks, validating them against
+  Google's structured data guidelines, recommending improvements, and generating ready-to-paste JSON-LD
+  code blocks. Always use this skill when schema or structured data work is mentioned, even casually.
+---
+
+# Schema Auditor
+
+Audit, validate, and optimize JSON-LD structured data on Dermadry web pages. The primary goal of this skill is to **create supplementary schema blocks** that enhance what already exists on the page. Almost every Dermadry URL already contains a pre-templated Organization schema injected by Shopify. That Organization schema should be treated as a given and left alone. The value this skill provides is identifying what additional schema blocks the page is missing and generating those new blocks.
+
+## Critical Principle: Do Not Touch the Shopify Organization Schema
+
+Nearly every page on dermadry.com ships with a Shopify-generated Organization schema block. This is a platform default that Dermadry does not need to manually maintain or optimize. **Never suggest altering, replacing, rewriting, or "fixing" this block** unless it contains a genuine breaking error (malformed JSON, completely wrong values). Minor imperfections or missing recommended fields in the Shopify Organization schema are not worth flagging. Instead, direct all effort toward creating new, high-value supplementary schema blocks that the page does not yet have.
+
+## Core Workflow
+
+Follow these steps every time the user provides a URL:
+
+### Step 1: Fetch and Extract
+
+1. Use `web_fetch` to retrieve the full HTML of the provided URL.
+2. Parse out every `<script type="application/ld+json">` block from the page source.
+3. Parse each block as JSON. If any block fails to parse, flag it immediately as a syntax error.
+4. List each schema block found, numbered, showing:
+   - The `@type` value
+   - A brief summary of what it contains (e.g., "Organization schema with name, url, logo")
+   - Whether it is a Shopify default or a custom addition
+5. **Immediately tag any Organization schema as "Shopify default, no action needed"** and move on. Do not audit or critique it unless the user specifically asks.
+
+### Step 2: Validate Non-Shopify Blocks
+
+For each extracted schema block **that is NOT the Shopify default Organization schema**, validate against Google's structured data requirements. Read `references/google-schema-requirements.md` for the detailed requirements per type. Skip the Shopify Organization block entirely during this step.
+
+For each block, report:
+- **Required properties**: Which ones are present, which are missing
+- **Recommended properties**: Which ones are present, which could be added for richer results
+- **Errors**: Anything that would prevent the schema from being eligible for rich results
+- **Warnings**: Things that are technically valid but suboptimal
+
+Present this as a clear audit summary. Use a conversational tone, not a raw data dump. Group findings by severity: errors first, then missing required fields, then recommended improvements.
+
+### Step 3: Recommend Supplementary Blocks (Do NOT Generate Code Yet)
+
+Based on the audit, present recommendations with the primary focus on **new supplementary schema blocks to add**. This is where the real value is.
+
+**A. New schema blocks to add (primary focus):**
+- Identify which additional schema types would benefit this page based on its content
+- For each suggestion, briefly explain what it does and what rich result it can unlock
+- Common suggestions by page type:
+  - Product pages: Product, Review/AggregateRating, FAQPage, BreadcrumbList, MedicalDevice (if applicable)
+  - Blog/article pages: Article or BlogPosting, FAQPage, HowTo, BreadcrumbList
+  - Landing pages: FAQPage, BreadcrumbList, WebPage
+  - Homepage: WebSite (with SearchAction if relevant), BreadcrumbList
+
+**B. Fixes to existing custom blocks (secondary, if applicable):**
+- If the page has any custom (non-Shopify) schema blocks that contain errors, list what needs to change
+- Explain why each change matters
+- Do NOT include the Shopify Organization schema here
+
+### Step 4: Generate Code (Only After Approval)
+
+Once the user confirms which schemas to create or update:
+
+1. Generate each schema as a **separate** `<script type="application/ld+json">` block. Never combine multiple schema types into one block unless they are naturally nested (e.g., a Product with an embedded AggregateRating).
+2. Auto-fill Dermadry organization details where applicable. Read `references/dermadry-defaults.md` for the standard values to use.
+3. For each generated block, include a brief note on where to place it (e.g., "Add this to the `<head>` section" or "Replace the existing Product schema").
+4. Present blocks one at a time so the user can review each before moving to the next.
+
+## Key Principles
+
+### Separate Blocks, Always
+Keep schema blocks separate. Every new supplementary schema should be its own standalone `<script type="application/ld+json">` block, placed alongside the existing Shopify Organization schema. Never merge new schemas into the Shopify block, and never combine schemas into a single `@graph` array unless the user explicitly asks for it.
+
+### Shopify Organization Schema Is Off-Limits
+The Shopify-generated Organization schema is a platform default that ships on virtually every Dermadry page. Treat it as infrastructure you do not own. Do not audit it, do not suggest improvements to it, do not recommend adding recommended properties to it. The only exception is if it contains genuinely broken JSON. All optimization energy goes toward creating new supplementary blocks.
+
+### Dermadry Context
+Dermadry is a Canadian medical device company. Their products are FDA-cleared iontophoresis devices for hyperhidrosis (excessive sweating). When suggesting schemas:
+- `MedicalDevice` type is relevant for product pages
+- Medical claims should reference FDA 510(k) clearance where appropriate
+- The brand context matters for `Product` schema (manufacturer, brand fields)
+
+### Google's Requirements Are the Standard
+Always validate against Google's current structured data documentation. When in doubt about whether a property is required or recommended, defer to Google's guidelines. Read `references/google-schema-requirements.md` for the specific requirements per schema type.
+
+## Reference Files
+
+- `references/google-schema-requirements.md`: Detailed requirements and recommended properties for each schema type (Product, FAQPage, Article, HowTo, etc.). Read this before validating any schema.
+- `references/dermadry-defaults.md`: Dermadry organization details for auto-filling brand, publisher, and organization fields.
