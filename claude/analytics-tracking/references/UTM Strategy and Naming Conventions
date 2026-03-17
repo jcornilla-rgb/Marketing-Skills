@@ -1,0 +1,192 @@
+# UTM Strategy and Naming Conventions
+
+Reference guide for building a consistent UTM tagging system. Read this file when the user needs help with campaign tracking parameters, attribution, or UTM naming conventions.
+
+## Table of Contents
+
+1. [UTM Parameters Explained](#parameters)
+2. [Naming Convention Rules](#naming-rules)
+3. [Source and Medium Taxonomy](#taxonomy)
+4. [UTM Templates by Channel](#templates)
+5. [UTM Documentation and Governance](#governance)
+6. [Common Mistakes to Avoid](#mistakes)
+
+---
+
+## UTM Parameters Explained {#parameters}
+
+| Parameter | Purpose | Required | Example |
+|---|---|---|---|
+| utm_source | Where the traffic originates | Yes | google, facebook, newsletter, partner_site |
+| utm_medium | The marketing channel or mechanism | Yes | cpc, email, social, referral, display |
+| utm_campaign | The specific campaign or promotion | Yes | spring_sale, product_launch_q2, brand_awareness |
+| utm_content | Differentiates ad variations or link placements | No | hero_cta, sidebar_link, variant_a |
+| utm_term | Identifies paid search keywords | No | running_shoes, crm_software |
+
+### How GA4 uses UTMs
+
+GA4 automatically reads UTM parameters and maps them to its traffic source dimensions. This is how Default Channel Groups (Organic Search, Paid Social, Email, etc.) get populated. Incorrect UTMs will cause traffic to be miscategorized.
+
+---
+
+## Naming Convention Rules {#naming-rules}
+
+Consistency is everything. A single misspelling or capitalization inconsistency creates a new entry in your reports.
+
+### Mandatory rules
+
+1. **Lowercase everything**: `google` not `Google`, `email` not `Email`
+2. **Use underscores for spaces**: `product_launch` not `product launch` or `product-launch`
+3. **No special characters**: Only letters, numbers, and underscores
+4. **Be specific but concise**: `blog_footer_cta` not `cta1`
+5. **Use dates when relevant**: `2025_q1_promo` not just `promo`
+6. **Never use internal jargon** that you would not understand in 6 months
+
+### Naming hierarchy pattern
+
+Build UTM values from general to specific:
+
+```
+utm_campaign: [initiative]_[detail]_[date]
+Example: product_launch_enterprise_2025q1
+
+utm_content: [location]_[variant]
+Example: hero_cta_variant_b
+```
+
+---
+
+## Source and Medium Taxonomy {#taxonomy}
+
+Standardize these values across your entire organization. Every team member and tool should use the same values.
+
+### Recommended source values
+
+| Source Value | When to Use |
+|---|---|
+| google | Google Ads, Google organic (auto-tagged) |
+| facebook | Meta Ads (Facebook + Instagram) |
+| instagram | Organic Instagram posts (not ads) |
+| linkedin | LinkedIn Ads or organic posts |
+| twitter | X/Twitter organic or ads |
+| youtube | YouTube ads or descriptions |
+| newsletter | Your own email newsletter |
+| partner_[name] | Specific partner referrals |
+| direct_mail | Physical mail campaigns |
+| podcast_[name] | Specific podcast appearances or sponsorships |
+
+### Recommended medium values
+
+| Medium Value | When to Use | GA4 Default Channel |
+|---|---|---|
+| cpc | Paid search (Google, Bing) | Paid Search |
+| paid_social | Paid social ads | Paid Social |
+| social | Organic social posts | Organic Social |
+| email | Email campaigns and newsletters | Email |
+| referral | Partner or affiliate links | Referral |
+| display | Banner and display ads | Display |
+| video | Video ads (pre-roll, YouTube) | Video |
+| affiliate | Affiliate program links | Affiliates |
+| retargeting | Retargeting/remarketing campaigns | Display (or custom) |
+| sms | Text message campaigns | SMS |
+| qr | QR code scans | (custom channel) |
+
+**Important**: GA4 uses the medium value to assign traffic to Default Channel Groups. Using non-standard values (e.g., `paid` instead of `cpc`) will push traffic into "Unassigned." Stick to the values above.
+
+---
+
+## UTM Templates by Channel {#templates}
+
+### Paid Search (Google Ads)
+
+Use auto-tagging (GCLID) for Google Ads. Manual UTMs are a backup or for non-Google search engines.
+
+```
+?utm_source=google&utm_medium=cpc&utm_campaign=[campaign_name]&utm_term=[keyword]&utm_content=[ad_group]
+```
+
+### Paid Social (Meta Ads)
+
+```
+?utm_source=facebook&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}
+```
+
+Use Meta's dynamic URL parameters (double curly braces) to auto-populate values from ad settings.
+
+### Email Campaigns
+
+```
+?utm_source=newsletter&utm_medium=email&utm_campaign=[campaign_name]&utm_content=[link_location]
+```
+
+Example: `?utm_source=newsletter&utm_medium=email&utm_campaign=weekly_digest_20250315&utm_content=hero_cta`
+
+### Organic Social
+
+```
+?utm_source=[platform]&utm_medium=social&utm_campaign=[campaign_name]&utm_content=[post_type]
+```
+
+Example: `?utm_source=linkedin&utm_medium=social&utm_campaign=thought_leadership&utm_content=carousel_post`
+
+### Partner and Affiliate
+
+```
+?utm_source=partner_[name]&utm_medium=referral&utm_campaign=[campaign_name]&utm_content=[placement]
+```
+
+### QR Codes
+
+```
+?utm_source=[location]&utm_medium=qr&utm_campaign=[campaign_name]&utm_content=[material_type]
+```
+
+Example: `?utm_source=conference_booth&utm_medium=qr&utm_campaign=saas_expo_2025&utm_content=brochure`
+
+---
+
+## UTM Documentation and Governance {#governance}
+
+### Create a UTM tracker
+
+Every team that creates UTMs should log them in a shared document. Minimum fields:
+
+| Field | Purpose |
+|---|---|
+| Campaign name | What initiative this supports |
+| Source | utm_source value |
+| Medium | utm_medium value |
+| Content | utm_content value (if used) |
+| Full URL | The complete tagged URL |
+| Owner | Who created it |
+| Launch date | When the link goes live |
+| Status | Active, completed, or retired |
+
+### Tools for UTM management
+
+- **Google's Campaign URL Builder**: Free, manual entry
+- **UTM.io**: Team-based UTM management with templates and validation
+- **Spreadsheet formula**: Build your own with string concatenation
+- **URL shortener integration**: Use Bitly, Rebrandly, or Dub to shorten tagged URLs
+
+### Governance tips
+
+- Assign one person to own the UTM naming conventions document
+- Review UTM consistency monthly in GA4 (check for duplicates, misspellings)
+- Build template URLs for recurring campaigns (weekly newsletter, monthly social)
+- Use a URL shortener to make tagged links presentable in public-facing contexts
+
+---
+
+## Common Mistakes to Avoid {#mistakes}
+
+| Mistake | Problem | Fix |
+|---|---|---|
+| Inconsistent capitalization | `Google` and `google` create two separate source entries | Enforce lowercase in all UTMs |
+| Using spaces | URLs break, parameters get truncated | Use underscores: `spring_sale` |
+| Tagging internal links | Overwrites original source attribution | Never put UTMs on links within your own site |
+| Too vague | `utm_campaign=promo` is useless in 3 months | Include date and specifics: `spring_promo_2025q1` |
+| Forgetting utm_medium | Traffic falls into "Unassigned" channel group | Always include source AND medium |
+| Non-standard mediums | `paid` instead of `cpc` breaks channel grouping | Use GA4-compatible medium values |
+| No documentation | Nobody remembers what `utm_campaign=abc123` meant | Log every UTM in a shared tracker |
+| Double-tagging Google Ads | Manual UTMs conflict with auto-tagging (GCLID) | Let auto-tagging handle Google Ads; use UTMs as fallback only |
