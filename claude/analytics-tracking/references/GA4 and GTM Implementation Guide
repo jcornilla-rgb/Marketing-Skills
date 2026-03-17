@@ -1,0 +1,369 @@
+# GA4 and GTM Implementation Guide
+
+Reference guide for implementing analytics tracking with Google Analytics 4 and Google Tag Manager. Read this file when the user needs specific implementation code or configuration steps for GA4/GTM.
+
+## Table of Contents
+
+1. [GA4 Configuration](#ga4-configuration)
+2. [Enhanced Measurement Events](#enhanced-measurement)
+3. [Custom Events in GA4](#custom-events)
+4. [Conversions Setup](#conversions)
+5. [Custom Dimensions and Metrics](#custom-dimensions)
+6. [GTM Container Structure](#gtm-structure)
+7. [Data Layer Patterns](#data-layer)
+8. [Consent Mode v2](#consent-mode)
+9. [Server-Side GTM](#server-side)
+10. [Debugging GA4 and GTM](#debugging)
+
+---
+
+## GA4 Configuration
+
+### Data Streams
+
+Set up one data stream per platform:
+- Web (one per domain)
+- iOS app
+- Android app
+
+Enable enhanced measurement on each web stream. This gives you automatic tracking for common events without custom code.
+
+### GA4 Property Settings
+
+- **Data retention**: Set to 14 months (max) for meaningful analysis. Default is 2 months.
+- **Google Signals**: Enable for cross-device reporting (requires consent in EU/UK).
+- **User ID**: Enable if your app has authenticated users.
+- **BigQuery export**: Enable for raw event data access (free up to quota limits).
+
+---
+
+## Enhanced Measurement Events {#enhanced-measurement}
+
+GA4 tracks these automatically when enhanced measurement is enabled:
+
+| Event | What It Tracks | Notes |
+|---|---|---|
+| page_view | Every page load and history change | Automatic, cannot disable |
+| scroll | User scrolls past 90% of page depth | Single threshold only |
+| outbound_click | Clicks to external domains | Captures link URL |
+| site_search | Use of on-site search | Triggers on URL query parameters |
+| video_engagement | YouTube embedded video interactions | Start, progress (10/25/50/75%), complete |
+| file_download | Downloads of common file types | pdf, xlsx, docx, csv, etc. |
+
+**Recommendation**: Leave all of these enabled. They provide a solid baseline with zero implementation effort. Supplement with custom events for business-specific actions.
+
+---
+
+## Custom Events in GA4 {#custom-events}
+
+### Using gtag.js (direct implementation)
+
+```javascript
+// Basic custom event
+gtag('event', 'signup_completed', {
+  'method': 'email',
+  'plan': 'free'
+});
+
+// E-commerce purchase
+gtag('event', 'purchase', {
+  'transaction_id': 'T12345',
+  'value': 99.99,
+  'currency': 'USD',
+  'items': [{
+    'item_id': 'SKU_123',
+    'item_name': 'Pro Plan Monthly',
+    'price': 99.99,
+    'quantity': 1
+  }]
+});
+
+// CTA click with context
+gtag('event', 'cta_clicked', {
+  'button_text': 'Start Free Trial',
+  'button_location': 'hero_section',
+  'page_type': 'homepage'
+});
+```
+
+### Using GTM Data Layer (recommended for most setups)
+
+```javascript
+// Push event to data layer
+dataLayer.push({
+  'event': 'signup_completed',
+  'method': 'email',
+  'plan': 'free'
+});
+
+// Push user properties
+dataLayer.push({
+  'event': 'user_login',
+  'user_id': 'USR_12345',
+  'user_type': 'premium',
+  'account_created': '2024-03-15'
+});
+
+// E-commerce data layer push
+dataLayer.push({
+  'event': 'purchase',
+  'ecommerce': {
+    'transaction_id': 'T12345',
+    'value': 99.99,
+    'currency': 'USD',
+    'items': [{
+      'item_id': 'SKU_123',
+      'item_name': 'Pro Plan Monthly',
+      'price': 99.99,
+      'quantity': 1
+    }]
+  }
+});
+```
+
+### GA4 Recommended Events
+
+Use Google's predefined event names when possible. These unlock enhanced reporting and integrations.
+
+| Category | Events |
+|---|---|
+| Lead generation | generate_lead, sign_up, login |
+| Content | search, select_content, share |
+| E-commerce | view_item, add_to_cart, begin_checkout, purchase, refund |
+| Engagement | page_view, scroll, video_start, video_complete |
+
+Full list: https://support.google.com/analytics/answer/9267735
+
+---
+
+## Conversions Setup {#conversions}
+
+### Steps to configure a conversion in GA4:
+
+1. Verify the event is collecting data in the Events report
+2. Navigate to Admin > Events and toggle "Mark as conversion" for the event
+3. Choose counting method: "Once per session" (leads, signups) or "Every event" (purchases)
+4. If running Google Ads, import conversions from GA4 into your Ads account for bidding optimization
+
+### Conversion best practices:
+
+- Keep the number of conversions small and meaningful (5-10 max)
+- Every conversion should represent a real business outcome
+- Use "once per session" for lead-type events, "every event" for revenue events
+- Test that conversions record correctly in both GA4 and Google Ads
+
+---
+
+## Custom Dimensions and Metrics {#custom-dimensions}
+
+### When to create custom dimensions:
+
+- You need to segment reports by a property not available by default (e.g., user_type, plan_tier, content_author)
+- You want to filter or compare data using a business-specific attribute
+
+### Setup steps:
+
+1. Go to Admin > Custom definitions > Create custom dimension
+2. Choose scope: Event (per-event value), User (persists across sessions), or Item (e-commerce)
+3. Set the parameter name to match exactly what you send in the event
+
+### Common custom dimensions:
+
+| Name | Scope | Parameter | Use Case |
+|---|---|---|---|
+| user_type | User | user_type | Segment free vs paid behavior |
+| plan_tier | User | plan_tier | Compare engagement by plan |
+| content_group | Event | content_group | Group pages into categories |
+| signup_method | Event | method | Understand registration sources |
+| experiment_variant | Event | variant | A/B test analysis |
+
+---
+
+## GTM Container Structure {#gtm-structure}
+
+### Organizing your container
+
+Use folders to group related items. A clean container is a maintainable container.
+
+**Recommended folder structure:**
+- GA4 Core (configuration tag + pageview)
+- GA4 Events (all custom event tags)
+- Conversion Pixels (Meta, LinkedIn, Google Ads)
+- Utility (data layer variables, lookup tables)
+
+### Naming conventions for GTM:
+
+| Type | Pattern | Example |
+|---|---|---|
+| Tags | [Type] - [Description] | GA4 Event - Signup Completed |
+| Triggers | [Type] - [Description] | Click - CTA Hero Button |
+| Variables | [Type] - [Name] | DLV - user_type |
+
+### Best practices:
+
+- Add version notes on every publish describing what changed
+- Always use Preview Mode before publishing
+- Use workspaces if multiple people edit the container
+- Never hardcode values in tags when a variable or data layer value will work
+
+---
+
+## Data Layer Patterns {#data-layer}
+
+The data layer is the bridge between your website's code and GTM. Push structured data to it, then reference that data in GTM variables and triggers.
+
+### Initialize the data layer
+
+Place this before the GTM container snippet in your HTML head:
+
+```html
+<script>
+  window.dataLayer = window.dataLayer || [];
+</script>
+```
+
+### Push patterns
+
+```javascript
+// Simple event
+dataLayer.push({
+  'event': 'form_submitted',
+  'form_name': 'contact',
+  'form_location': 'footer'
+});
+
+// Event with user context
+dataLayer.push({
+  'event': 'checkout_started',
+  'cart_value': 149.99,
+  'cart_items': 3,
+  'user_type': 'returning'
+});
+
+// Update user properties (no event trigger)
+dataLayer.push({
+  'user_id': 'USR_12345',
+  'user_type': 'premium'
+});
+
+// Clear e-commerce data between pushes (prevents stale data)
+dataLayer.push({ ecommerce: null });
+dataLayer.push({
+  'event': 'purchase',
+  'ecommerce': {
+    'transaction_id': 'T12345',
+    'value': 99.99,
+    'currency': 'USD',
+    'items': [{ ... }]
+  }
+});
+```
+
+### Important: Always clear e-commerce objects
+
+GA4 e-commerce events can bleed data between pushes if you do not clear the ecommerce object first. Always push `{ ecommerce: null }` before a new e-commerce event.
+
+---
+
+## Consent Mode v2 {#consent-mode}
+
+### What it is
+
+Google's Consent Mode lets you adjust how Google tags behave based on user consent. It is required for EU audiences if you use Google Ads remarketing or conversion tracking.
+
+### Consent types
+
+| Signal | Controls | Default (no consent) |
+|---|---|---|
+| ad_storage | Advertising cookies | denied |
+| analytics_storage | Analytics cookies | denied |
+| ad_user_data | Sending user data to Google for ads | denied |
+| ad_personalization | Remarketing and personalization | denied |
+
+### Implementation
+
+```javascript
+// Set default consent state (before GTM loads)
+gtag('consent', 'default', {
+  'ad_storage': 'denied',
+  'analytics_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+  'wait_for_update': 500
+});
+
+// Update when user grants consent
+gtag('consent', 'update', {
+  'ad_storage': 'granted',
+  'analytics_storage': 'granted',
+  'ad_user_data': 'granted',
+  'ad_personalization': 'granted'
+});
+```
+
+### With a CMP (recommended)
+
+Most Consent Management Platforms (Cookiebot, OneTrust, Osano, etc.) have built-in GTM integrations that handle consent mode automatically. Configure through:
+1. CMP dashboard: Set up consent categories
+2. GTM: Use the CMP's community template tag
+3. Test: Verify consent signals fire correctly in Preview Mode
+
+---
+
+## Server-Side GTM {#server-side}
+
+### When to use server-side tracking
+
+- Ad blockers are significantly reducing your data quality
+- You need to control exactly what data leaves the browser
+- Privacy requirements demand server-side processing
+- You want to extend cookie lifetimes (first-party context)
+
+### Architecture
+
+Browser GTM container sends data to a server GTM container (hosted on your domain or a subdomain). The server container then forwards data to GA4, Google Ads, Meta, etc.
+
+### Setup overview
+
+1. Create a Server container in GTM
+2. Deploy to Google Cloud (App Engine) or a custom hosting environment
+3. Configure your web container to send data to the server container endpoint
+4. Set up server-side tags for each destination (GA4, Ads, etc.)
+5. Map and transform data as needed in the server container
+
+Server-side GTM adds complexity and hosting costs. Only implement when the benefits clearly justify the overhead.
+
+---
+
+## Debugging GA4 and GTM {#debugging}
+
+### GA4 DebugView
+
+1. Enable debug mode by adding `?debug_mode=true` to any page URL
+2. Or install the GA Debugger Chrome extension
+3. Open GA4 > Admin > DebugView
+4. Navigate your site and watch events appear in real time
+5. Click any event to inspect its parameters
+
+### GTM Preview Mode
+
+1. Click "Preview" in your GTM workspace
+2. Enter the URL of the page to test
+3. A debug panel shows which tags fired, which triggers matched, and the data layer state
+4. Make changes and re-test without publishing
+5. Only publish after everything validates correctly
+
+### Network Tab Inspection
+
+1. Open Chrome DevTools > Network tab
+2. Filter by `collect` (for GA4) or your analytics tool's endpoint
+3. Inspect the payload to verify event names and parameter values
+4. Check for duplicate requests (indicates duplicate tagging)
+
+### Quick diagnostic checklist
+
+- Is GTM loading? (check for `gtm.js` in Network tab)
+- Is the data layer populating? (check `dataLayer` in Console)
+- Is the trigger firing? (check GTM Preview Mode)
+- Is the tag sending data? (check Network tab for collect requests)
+- Is GA4 receiving it? (check DebugView or Realtime reports)
